@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<body>
+    <th:block th:replace="~{layout/default :: layout('投稿詳細', ~{::content})}">
+        <th:block th:fragment="content">
+            <article class="post-detail">
+                <div class="post-detail-header">
+                    <span class="category-badge" th:classappend="${post.category.name() == 'EVENT' ? ' badge-event' :
+                                       (post.category.name() == 'NOTICE' ? ' badge-notice' : ' badge-help')}"
+                        th:text="${post.category.displayName}">カテゴリ</span>
+                    <span class="post-date" th:text="${#temporals.format(post.createdAt, 'yyyy/MM/dd HH:mm')}">日付</span>
+                </div>
+
+                <h2 class="post-detail-title" th:text="${post.title}">タイトル</h2>
+                <p class="post-detail-author" th:text="'👤 ' + ${post.user.name}">投稿者</p>
+                <div class="post-detail-body" th:text="${post.body}">本文</div>
+
+                <div class="like-area">
+                    <form sec:authorize="isAuthenticated()" th:action="@{/posts/{id}/likes(id=${post.id})}"
+                        method="post">
+                        <button type="submit" th:class="${liked} ? 'btn btn-liked' : 'btn btn-like'">
+                            <span th:text="${liked} ? '❤️ いいね済み' : '🤍 いいね'">いいね</span>
+                        </button>
+                    </form>
+                    <span class="like-count" th:text="'❤️ ' + ${likeCount} + ' 件'">0件</span>
+                </div>
+
+                <div sec:authorize="isAuthenticated()" th:if="${post.user.email == #authentication.name}"
+                    class="post-actions">
+                    <a th:href="@{/posts/{id}/edit(id=${post.id})}" class="btn btn-edit">編集</a>
+                    <form th:action="@{/posts/{id}/delete(id=${post.id})}" method="post"
+                        onsubmit="return confirm('本当に削除しますか？')">
+                        <button type="submit" class="btn btn-delete">削除</button>
+                    </form>
+                </div>
+            </article>
+
+            <div class="back-link">
+                <a th:href="@{/posts}">← 一覧に戻る</a>
+            </div>
+
+            <section class="comment-section">
+                <h3 class="comment-title">💬 コメント（<span th:text="${post.comments.size()}">0</span>件）</h3>
+
+                <div th:if="${commentError}" class="error-message error-box" th:text="${commentError}">エラー</div>
+
+                <p th:if="${#lists.isEmpty(post.comments)}" class="empty-message">まだコメントはありません。</p>
+
+                <div th:each="comment : ${post.comments}" class="comment-card">
+                    <div class="comment-header">
+                        <span class="comment-author" th:text="'👤 ' + ${comment.user.name}">投稿者</span>
+                        <span class="comment-date"
+                            th:text="${#temporals.format(comment.createdAt, 'yyyy/MM/dd HH:mm')}">日付</span>
+                    </div>
+                    <p class="comment-body" th:text="${comment.body}">コメント本文</p>
+                </div>
+
+                <div sec:authorize="isAuthenticated()" class="comment-form-area">
+                    <h4 class="comment-form-title">コメントを投稿する</h4>
+                    <form th:action="@{/posts/{id}/comments(id=${post.id})}" method="post" class="comment-form">
+                        <textarea name="body" rows="3" placeholder="コメントを入力してください（500文字以内）"
+                            class="form-control"></textarea>
+                        <button type="submit" class="btn btn-primary">投稿する</button>
+                    </form>
+                </div>
+
+                <div sec:authorize="!isAuthenticated()" class="login-prompt">
+                    <p>コメントするには<a th:href="@{/login}">ログイン</a>が必要です。</p>
+                </div>
+            </section>
+        </th:block>
+    </th:block>
+</body>
+
+</html>

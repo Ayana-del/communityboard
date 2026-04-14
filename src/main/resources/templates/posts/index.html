@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<body>
+    <th:block th:replace="~{layout/default :: layout('投稿一覧', ~{::content})}">
+        <th:block th:fragment="content">
+            <section class="content-header">
+                <div class="content-header-main">
+                    <h2 class="page-title">
+                        <span th:if="${selectedCategory == null}">📋 すべての投稿</span>
+                        <span th:if="${selectedCategory == 'EVENT'}">🎉 イベント</span>
+                        <span th:if="${selectedCategory == 'NOTICE'}">📢 お知らせ</span>
+                        <span th:if="${selectedCategory == 'HELP'}">🤝 助け合い</span>
+                    </h2>
+                    <p class="page-description">
+                        地域の出来事やお知らせ、ちょっとした相談ごとまで、みんなで気軽に共有できます。
+                    </p>
+                </div>
+            </section>
+
+            <section th:if="${#lists.isEmpty(posts)}" class="empty-message empty-state">
+                <p class="empty-title">まだ投稿はありません</p>
+                <p class="empty-description">地域の出来事やお知らせを、最初に共有してみませんか？</p>
+                <a sec:authorize="isAuthenticated()" th:href="@{/posts/new}" class="btn btn-primary">最初の投稿をする</a>
+            </section>
+
+            <section th:unless="${#lists.isEmpty(posts)}" class="post-list">
+                <article th:each="post : ${posts}" class="post-card">
+                    <div class="post-card-header">
+                        <span class="category-badge" th:classappend="${post.category.name() == 'EVENT' ? ' badge-event' :
+                                           (post.category.name() == 'NOTICE' ? ' badge-notice' : ' badge-help')}"
+                            th:text="${post.category.displayName}">カテゴリ</span>
+                        <span class="post-date" th:text="${#temporals.format(post.createdAt, 'yyyy/MM/dd')}">日付</span>
+                    </div>
+
+                    <h3 class="post-title">
+                        <a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}">タイトル</a>
+                    </h3>
+
+                    <p class="post-body-preview" th:text="${#strings.abbreviate(post.body, 80)}">本文プレビュー</p>
+
+                    <div class="post-card-footer">
+                        <span class="post-author" th:text="'👤 ' + ${post.user.name}">投稿者</span>
+                        <span class="post-likes">❤️ 0</span>
+                        <span class="post-comments">💬 0</span>
+                    </div>
+                </article>
+            </section>
+        </th:block>
+    </th:block>
+</body>
+
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<body>
+    <th:block th:replace="~{layout/default :: layout('ログイン', ~{::content})}">
+        <th:block th:fragment="content">
+            <section class="form-page auth-page">
+                <div class="form-container">
+                    <div class="form-header">
+                        <h2 class="page-title">🔑 ログイン</h2>
+                        <p class="form-description">登録済みのアカウントでログインしてください。</p>
+                    </div>
+
+                    <div th:if="${successMessage}" class="success-message" th:text="${successMessage}">成功</div>
+
+                    <div th:if="${param.error}" class="error-message error-box">
+                        メールアドレスまたはパスワードが正しくありません。
+                    </div>
+
+                    <form th:action="@{/login}" method="post" class="app-form">
+                        <div class="form-group">
+                            <label for="username" class="form-label">メールアドレス</label>
+                            <input type="email" id="username" name="username" class="form-control"
+                                placeholder="例：taro@example.com" autofocus>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label">パスワード</label>
+                            <input type="password" id="password" name="password" class="form-control"
+                                placeholder="パスワードを入力してください">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">ログイン</button>
+                        </div>
+                    </form>
+
+                    <div class="form-footer">
+                        <p>アカウントをお持ちでない方は<a th:href="@{/register}">新規登録</a></p>
+                    </div>
+
+                    <div class="sample-account">
+                        <p class="sample-account-title">📝 サンプルアカウント</p>
+                        <p>メール：taro@example.com</p>
+                        <p>パスワード：password123</p>
+                    </div>
+                </div>
+            </section>
+        </th:block>
+    </th:block>
+</body>
+
+</html>

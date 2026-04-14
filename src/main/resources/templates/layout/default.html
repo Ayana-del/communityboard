@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+    th:fragment="layout(title, content)">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${title} != null ? title + ' | ちいきボード' : 'ちいきボード'">ちいきボード</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a th:href="@{/posts}" class="site-logo">🏘 ちいきボード</a>
+            <p class="site-tagline">
+                地域のつながりをデジタルで。イベント、お知らせ、助け合いを気軽に共有できるコミュニティボードです。
+            </p>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a th:href="@{/posts}" class="nav-link">ホーム</a>
+            <a sec:authorize="isAuthenticated()" th:href="@{/posts/new}" class="nav-link nav-link-post">＋ 投稿する</a>
+
+            <div sec:authorize="!isAuthenticated()" class="nav-auth">
+                <a th:href="@{/login}" class="nav-link">ログイン</a>
+                <a th:href="@{/register}" class="nav-link nav-link-register">新規登録</a>
+            </div>
+
+            <div sec:authorize="isAuthenticated()" class="nav-auth">
+                <span class="nav-user">
+                    <span class="nav-username" sec:authentication="name">ユーザー名</span>
+                    <span class="nav-user-suffix">さん</span>
+                </span>
+                <form th:action="@{/logout}" method="post" class="logout-form">
+                    <button type="submit" class="nav-link nav-link-logout">ログアウト</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-inner">
+                <h3 class="sidebar-title">カテゴリ</h3>
+                <ul class="category-list">
+                    <li><a th:href="@{/posts}" class="category-link">📋 すべて</a></li>
+                    <li><a th:href="@{/posts(category='EVENT')}" class="category-link">🎉 イベント</a></li>
+                    <li><a th:href="@{/posts(category='NOTICE')}" class="category-link">📢 お知らせ</a></li>
+                    <li><a th:href="@{/posts(category='HELP')}" class="category-link">🤝 助け合い</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-shell" th:replace="${content}">
+                <!-- page content -->
+            </div>
+        </main>
+    </div>
+
+    <footer class="site-footer">
+        <p>© 2026 ちいきボード</p>
+    </footer>
+</body>
+
+</html>
